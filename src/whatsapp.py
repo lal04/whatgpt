@@ -5,11 +5,14 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from src.apigpt import apigpt
+import re
+from collections import deque
 
 class whatsapp:
     def __init__(self) -> None:
         self.driver=webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
-              
+        self.gpt=apigpt()
         self.driver.get('https://web.whatsapp.com/')
         print('esperamos que a que inicie sesion con el QR')
         # Esperar a que la página esté completamente cargada (document.readyState)
@@ -53,18 +56,20 @@ class whatsapp:
             print( f'error: {e}')
     def reply_message(self, lisChats):
         try:
+            messages=deque(maxlen=10)
             for chat in lisChats:
                 chat.click()
-                input('esperando...')
                 # Encontrar todos los div con la clase "copyable-text"
                 divs = self.driver.find_elements(By.CLASS_NAME, "copyable-text")
                 # Iterar sobre cada div encontrado
                 for div in divs:
                     # Obtener el valor del atributo "data-pre-plain-text" del div
-                    data_pre_plain_text = div.get_attribute("data-pre-plain-text")
-                    if data_pre_plain_text is not None:
-                        print(data_pre_plain_text)
-                        print(div.text)
+                    header_message = div.get_attribute("data-pre-plain-text")
+                    if header_message is not None:
+                        rol=re.sub(r'\[[^\]]+\]|:\s*$','', header_message)
+                        rol=rol.replace(' ','')
+                        messages.append({"role":f"{rol}", "content":f"{div.text.replace("\n", " ")}"})
+                print(self.gpt.reply(messages))        
 
         except Exception as e:
             print(f'error: {e}')

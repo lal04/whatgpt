@@ -8,7 +8,7 @@ def main():
     
     input('presione enter')
     wtp.log_out()
-    input('presione enter')
+ 
 
 
 if __name__ == '__main__':

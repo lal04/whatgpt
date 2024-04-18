@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from src.apigpt import apigpt
 import re
 from collections import deque
+from selenium.webdriver.common.keys import Keys
 
 class whatsapp:
     def __init__(self) -> None:
@@ -17,7 +18,8 @@ class whatsapp:
         print('esperamos que a que inicie sesion con el QR')
         # Esperar a que la página esté completamente cargada (document.readyState)
         # Esperar hasta que un elemento esté visible
-        WebDriverWait(self.driver,90).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="side"]/span[1]/div/div/div[2]/div[1]')))
+        WebDriverWait(self.driver,120).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="side"]/span[1]/div/div/div[2]/div[1]')))
+        self.driver.execute_script("document.hidden = true")
        
 
     def check_messages(self):
@@ -57,20 +59,34 @@ class whatsapp:
     def reply_message(self, lisChats):
         try:
             messages=deque(maxlen=10)
+            
+
             for chat in lisChats:
                 chat.click()
                 # Encontrar todos los div con la clase "copyable-text"
                 divs = self.driver.find_elements(By.CLASS_NAME, "copyable-text")
+                #asignamro roles segun el chat
+                
+                nombreCuenta='Delivery'#asuminos que la cuenta se llama delivery
                 # Iterar sobre cada div encontrado
                 for div in divs:
                     # Obtener el valor del atributo "data-pre-plain-text" del div
                     header_message = div.get_attribute("data-pre-plain-text")
+                    
                     if header_message is not None:
                         rol=re.sub(r'\[[^\]]+\]|:\s*$','', header_message)
                         rol=rol.replace(' ','')
+                        if rol ==nombreCuenta:# verificamos quien envio el mensaje, si fuimos nosotrso se asignara assistan al rol
+                            rol='assistant'
+                        else:#y si no, se asignara user
+                            rol='user'
                         messages.append({"role":f"{rol}", "content":f"{div.text.replace("\n", " ")}"})
-                print(self.gpt.reply(messages))        
-
+                #insertamo y enviamos el mensaje
+                answer=self.gpt.reply(messages)
+                inputMesaages=self.driver.find_element(By.CSS_SELECTOR, ".x1hx0egp[contenteditable='true'][title='Escribe un mensaje'")
+                inputMesaages.send_keys(answer)
+                inputMesaages.send_keys(Keys.RETURN)
+                inputMesaages.send_keys(Keys.ESCAPE)
         except Exception as e:
             print(f'error: {e}')
 

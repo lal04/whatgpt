@@ -28,7 +28,48 @@ class apigpt:
         print(f"Total de tokens utilizados: {total_tokens}")
         
         return content
-        
+    def asistente(self):
+        # Definir una condición de salida del bucle
+        exit_condition = False
+
+        # Comienza el bucle de conversación
+        while not exit_condition:
+            # Crea un hilo de conversación en la versión beta de OpenAI dentro del bucle
+            thread = self.client.beta.threads.create()
+
+            # El usuario envía un mensaje
+            user_input = input("Usuario: ")
+            message = self.client.beta.threads.messages.create(
+                thread_id=thread.id,
+                role="user",
+                content=user_input,
+            )
+
+            # Crea un nuevo run para esta interacción
+            run = self.client.beta.threads.runs.create(
+                assistant_id=os.getenv("ASSISTANT_ID"),
+                thread_id=thread.id,
+            )
+
+            # Espera a que el run esté completo y obtén su estado
+            run = self.client.beta.threads.runs.poll(
+                run_id=run.id,
+                thread_id=thread.id,
+            )
+
+            # Si el run se completó correctamente, se listan los mensajes en el hilo de conversación
+            if run.status == "completed":
+                messages = self.client.beta.threads.messages.list(thread_id=thread.id)
+
+                for message in messages:
+                    if message.role == "assistant":
+                        print("Asistente:", message.content[0].text.value)
+
+                # Verificar si el usuario quiere salir
+                exit_condition = user_input.lower() == "salir"
+
+                
+                
     def none(self,messages):
 
         print('"fin" para terminar la charla: ')

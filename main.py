@@ -1,10 +1,16 @@
 from src.whatsapp import whatsapp
 from src.apigpt import apigpt
+from src.chat_threads import chat_threads
 import time
 
 def main():
+    hilo='lista 5'
 
-    apigpt().asistente()
+    if chat_threads().check_existence(hilo) is False:
+        chat_threads().add_thread_id(hilo)
+    else:
+        print('ya existe')
+
 
     # wtp=whatsapp()
 

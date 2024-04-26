@@ -4,12 +4,14 @@ from src.chat_threads import chat_threads
 import time
 
 def main():
-    hilo='lista 5'
-
-    if chat_threads().check_existence(hilo) is False:
-        chat_threads().add_thread_id(hilo)
+    #texto debe estar en byte
+    hilo='linea1'
+    verify=chat_threads().check_existence(hilo)
+    if False in verify:
+        print('no se encontro')
+        chat_threads().add_thread_id(verify)
     else:
-        print('ya existe')
+        print('se encontro')
 
 
     # wtp=whatsapp()

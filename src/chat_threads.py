@@ -39,7 +39,7 @@ class chat_threads:
             return False,''
     def add_thread_id(self, thread_id):
         # Cifrar el texto
-        texto_cifrado = self.cipher_suite.encrypt(thread_id)
+        texto_cifrado = self.cipher_suite.encrypt(thread_id.encode())
         # Abrir el archivo en modo de agregado ('a')
         with open('chat_threads.txt', 'a') as archivo:
             # Escribir contenido al final del archivo

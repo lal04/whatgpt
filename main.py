@@ -4,7 +4,7 @@ from src.chat_threads import chat_threads as ct
 
 
 def main():
-    texto_original=b'hola'
+    texto_original='como estas'
     valor=ct().check_existence(texto_original)
     if valor[0]:
         print('esta en la lista')

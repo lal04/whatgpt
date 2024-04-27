@@ -1,3 +1,4 @@
 .env
 __pycache__
-chat*
+chat_threads.txt
+.vs*

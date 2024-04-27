@@ -1,22 +1,21 @@
 from src.whatsapp import whatsapp
 from src.apigpt import apigpt
-from src.chat_threads import chat_threads
-import time
+from src.chat_threads import chat_threads as ct
+
 
 def main():
-    #texto debe estar en byte
-    hilo='linea1'
-    verify=chat_threads().check_existence(hilo)
-    if False in verify:
-        print('no se encontro')
-        chat_threads().add_thread_id(verify)
+    texto_original=b'hola'
+    valor=ct().check_existence(texto_original)
+    if valor[0]:
+        print('esta en la lista')
     else:
-        print('se encontro')
+        ct().add_thread_id(texto_original)
+        print('lo agregamos por que no se encontro')
 
 
     # wtp=whatsapp()
 
-    # condicion=True
+    # condicion=|rue
     # while condicion:
 
     #     listaChats=wtp.check_messages()

@@ -11,33 +11,40 @@ class chat_threads:
         if self.clave is None:
             raise ValueError("La clave de cifrado no está definida en el archivo .env")
         # Crear un objeto de cifrado
-        self.cipher_suite = Fernet(self.clave.encode())
+        self.cipher_suite = Fernet(self.clave)
         
     def check_existence(self,thread_id):
-        
-        with open('chat_threads.txt', 'r') as file:
-            # Lee todas las líneas del archivo y las guarda en una lista
-            lines = file.readlines()
+        try:
+            listDecifraso=[]
+            with open('chat_threads.txt', 'r') as file:
+                # Lee todas las líneas del archivo y las guarda en una lista
+                lines = file.readlines()
+                # Elimina los caracteres de salto de línea de cada línea
+                list_thread = [line.strip() for line in lines]
+                for i in list_thread:
+                    #eliminamos la 'b' y las colillas "'" 
+                    i = i.replace("'", "")[1:]
+                    #convertimos a bytes el texto cifrado
+                    # Descifrar el texto
+                    texto_descifrado = self.cipher_suite.decrypt(i.encode())
+                    #convertimos de bytes a cadena de texto
+                    listDecifraso.append(texto_descifrado.decode())
 
-        # Elimina los caracteres de salto de línea de cada línea
-        list_thread = [line.strip() for line in lines]
-        print(list_thread)
-        #lista_textos_decifrados = [self.cipher_suite.decrypt(texto_cifrado) for texto_cifrado in list_thread]
-        #print(lista_textos_decifrados)
-        if thread_id in list_thread:
-            
-            return True
-        
-        else:
-            # Cifrar el texto
-            cifrado= self.cipher_suite.encrypt(thread_id.encode())
-            # Abre el archivo en modo lectura
-            return False,cifrado
+            if thread_id  in listDecifraso:
+                return True,''
+            else:
+                return False, thread_id
+        except:
+            print('chat_theads esta vacio')
+            return False,''
     def add_thread_id(self, thread_id):
-         with open("chat_threads.txt", "a") as archivo:
-            # Añadir datos al final del archivo
-            thread_id=thread_id[1]
-            print(type(thread_id))
-            archivo.write(f"\n{thread_id}")
+        # Cifrar el texto
+        texto_cifrado = self.cipher_suite.encrypt(thread_id)
+        # Abrir el archivo en modo de agregado ('a')
+        with open('chat_threads.txt', 'a') as archivo:
+            # Escribir contenido al final del archivo
+            archivo.write(f'{texto_cifrado}\n')
+            
+    
         
         

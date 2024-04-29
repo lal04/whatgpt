@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet
 import os
 from dotenv import load_dotenv
+import pickle
 class chat_threads:
     def __init__(self):
         # Cargar las variables de entorno desde el archivo .env
@@ -13,9 +14,9 @@ class chat_threads:
         # Crear un objeto de cifrado
         self.cipher_suite = Fernet(self.clave)
         
-    def check_existence(self,thread_id):
+    def check_existence(self,diccionario):
         try:
-            listDecifraso=[]
+            listDecifrado=[]
             with open('chat_threads.txt', 'r') as file:
                 # Lee todas las líneas del archivo y las guarda en una lista
                 lines = file.readlines()
@@ -28,18 +29,23 @@ class chat_threads:
                     # Descifrar el texto
                     texto_descifrado = self.cipher_suite.decrypt(i.encode())
                     #convertimos de bytes a cadena de texto
-                    listDecifraso.append(texto_descifrado.decode())
-
-            if thread_id  in listDecifraso:
+                    diccionario_recuperado = pickle.loads(texto_descifrado)
+                    listDecifrado.append(diccionario_recuperado)
+                    
+            nombres = [diccionario['nombre'] for diccionario in listDecifrado]
+            if diccionario['nombre']  in nombres:
+                
                 return True,''
             else:
-                return False, thread_id
+                return False, diccionario
         except:
             print('chat_theads esta vacio')
             return False,''
-    def add_thread_id(self, thread_id):
+    def add_thread_id(self, diccionario):
+        #convertimos el diccionario a bytes
+        bytes_diccionario = pickle.dumps(diccionario)
         # Cifrar el texto
-        texto_cifrado = self.cipher_suite.encrypt(thread_id.encode())
+        texto_cifrado = self.cipher_suite.encrypt(bytes_diccionario)
         # Abrir el archivo en modo de agregado ('a')
         with open('chat_threads.txt', 'a') as archivo:
             # Escribir contenido al final del archivo

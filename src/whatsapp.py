@@ -7,8 +7,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from src.apigpt import apigpt
 import re
+from openai import OpenAI
 from collections import deque
 from selenium.webdriver.common.keys import Keys
+from src.chat_threads import chat_threads as ct
 
 class whatsapp:
     def __init__(self) -> None:
@@ -52,6 +54,25 @@ class whatsapp:
                     nombre_chat = chat.find_element(By.CSS_SELECTOR, 'span[title]').get_attribute('title')
                     print(f"Chat: {nombre_chat}")
                     print(n_mensajes)
+                    diccionario={
+                        'nombre':f'{nombre_chat}',
+                        'id':'',
+                    }
+                
+                    # pasamos un texto y verificamos si se encuntra en la lista
+                    # esta informacion la tenemos cifrada
+                    # si no esta lo agrega
+                    print(diccionario)
+                    valor=ct().check_existence(diccionario)
+                    if valor[0]:
+                         print('esta en la lista')
+                    else:
+                        # Crea un hilo de conversación en la versión beta de OpenAI dentro del bucle
+                        thread = self.client.beta.threads.create()
+                        ct().add_thread_id(diccionario)
+                        print('lo agregamos por que no se encontro')
+
+
                     lisChats.append(chat)
             return lisChats
         except Exception as e:

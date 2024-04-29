@@ -4,29 +4,14 @@ from src.chat_threads import chat_threads as ct
 
 
 def main():
-    texto_original='como estas'
-    valor=ct().check_existence(texto_original)
-    if valor[0]:
-        print('esta en la lista')
-    else:
-        ct().add_thread_id(texto_original)
-        print('lo agregamos por que no se encontro')
-
-
-    # wtp=whatsapp()
-
-    # condicion=|rue
-    # while condicion:
-
-    #     listaChats=wtp.check_messages()
-    #     wtp.reply_message(listaChats)
-
-    #     if input('fin si deseas detener el proceso')== 'fin':
-    #         condicion=False
     
 
+    wtp=whatsapp()
+
+    wtp.check_messages()
+    
         
-    # wtp.log_out()
+    wtp.log_out()
     
 
 

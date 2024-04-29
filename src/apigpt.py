@@ -28,6 +28,7 @@ class apigpt:
         print(f"Total de tokens utilizados: {total_tokens}")
         
         return content
+ 
     def asistente(self):
         # Definir una condición de salida del bucle
         exit_condition = False
@@ -44,19 +45,16 @@ class apigpt:
                 role="user",
                 content=user_input,
             )
-
             # Crea un nuevo run para esta interacción
             run = self.client.beta.threads.runs.create(
                 assistant_id=os.getenv("ASSISTANT_ID"),
                 thread_id=thread.id,
             )
-
             # Espera a que el run esté completo y obtén su estado
             run = self.client.beta.threads.runs.poll(
                 run_id=run.id,
                 thread_id=thread.id,
             )
-
             # Si el run se completó correctamente, se listan los mensajes en el hilo de conversación
             if run.status == "completed":
                 messages = self.client.beta.threads.messages.list(thread_id=thread.id)
